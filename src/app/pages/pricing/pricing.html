@@ -13,9 +13,6 @@
       @for (plan of plans; track plan.title; let i = $index) {
         <div class="pricing-card card" [class.pricing-card--highlight]="plan.highlight"
              data-reveal [attr.data-reveal-delay]="i * 100">
-          @if (plan.highlight) {
-            <div class="pricing-card__badge">Populaire</div>
-          }
           <h3>{{ plan.title }}</h3>
           <div class="pricing-card__price">
             <span class="pricing-card__amount">{{ plan.price }}</span>

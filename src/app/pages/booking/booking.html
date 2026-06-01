@@ -3,119 +3,265 @@
     <span class="eyebrow">Première étape</span>
     <h1>Prendre rendez-vous</h1>
     <div class="divider"></div>
-    <p>Remplissez ce formulaire et je vous contacterai dans les 24 heures.</p>
   </div>
 </div>
 
-<section class="section">
+<section class="section booking-section">
   <div class="container booking-layout">
 
-    <!-- Form -->
-    <div class="booking-form-wrap">
-      @if (success()) {
-        <div class="booking-success">
-          <div class="booking-success__icon">🌿</div>
-          <h3>Demande envoyée !</h3>
-          <p>Merci pour votre message. Je vous contacterai dans les 24 heures pour confirmer votre rendez-vous.</p>
-        </div>
-      } @else {
-        <form class="booking-form" (ngSubmit)="onSubmit()" #f="ngForm">
-          <h2>Votre demande</h2>
+    <!-- ══ COLONNE PRINCIPALE ══ -->
+    <div class="booking-main">
+
+      <!-- ── ÉTAPE 1: CALENDRIER ── -->
+      @if (step() === 'calendar') {
+        <div class="booking-card">
+
+          <!-- Header calendrier -->
+          <div class="booking-card__header">
+            <h2>Choisissez un créneau</h2>
+            @if (auth.isLoggedIn) {
+              <button class="btn-link" (click)="showMyBookings()">Mes rendez-vous →</button>
+            }
+          </div>
 
           @if (error()) {
-            <div class="booking-error">{{ error() }}</div>
+            <div class="alert alert--error">{{ error() }}</div>
           }
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="name">Nom complet *</label>
-              <input id="name" type="text" [(ngModel)]="form.name" name="name" required placeholder="Votre nom" />
+          <!-- Calendrier -->
+          <div class="cal">
+            <!-- Navigation mois -->
+            <div class="cal__nav">
+              <button class="cal__nav-btn" (click)="prevMonth()" aria-label="Mois précédent">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="cal__month-label">{{ monthLabel() }}</span>
+              <button class="cal__nav-btn" (click)="nextMonth()" aria-label="Mois suivant">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
             </div>
-            <div class="form-group">
-              <label for="email">Courriel *</label>
-              <input id="email" type="email" [(ngModel)]="form.email" name="email" required placeholder="votre@email.com" />
-            </div>
-          </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="phone">Téléphone</label>
-              <input id="phone" type="tel" [(ngModel)]="form.phone" name="phone" placeholder="450-000-0000" />
-            </div>
-            <div class="form-group">
-              <label for="date">Date préférée</label>
-              <input id="date" type="date" [(ngModel)]="form.preferred_date" name="preferred_date" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="service">Service souhaité *</label>
-            <select id="service" [(ngModel)]="form.service" name="service" required>
-              <option value="">Choisir un service...</option>
-              @for (s of services; track s) {
-                <option [value]="s">{{ s }}</option>
+            <!-- Jours de la semaine -->
+            <div class="cal__weekdays">
+              @for (d of ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']; track d) {
+                <span>{{ d }}</span>
               }
-            </select>
+            </div>
+
+            <!-- Grille des jours -->
+            <div class="cal__grid" [class.cal__grid--loading]="loading()">
+              @for (day of calendarDays(); track $index) {
+                <button
+                  class="cal__day"
+                  [class]="getDayClass(day.date)"
+                  [disabled]="!day.date || getDayClass(day.date) === 'cal__day--past' || getDayClass(day.date) === 'cal__day--no-slot' || getDayClass(day.date) === 'cal__day--full'"
+                  (click)="selectDate(day.date)"
+                  [attr.aria-label]="day.date ? formatDate(day.date) : null"
+                >
+                  {{ day.dayNum }}
+                </button>
+              }
+            </div>
+
+            <!-- Légende -->
+            <div class="cal__legend">
+              <span class="cal__legend-item"><span class="cal__dot cal__dot--available"></span>Disponible</span>
+              <span class="cal__legend-item"><span class="cal__dot cal__dot--full"></span>Complet</span>
+              <span class="cal__legend-item"><span class="cal__dot cal__dot--selected"></span>Sélectionné</span>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="message">Message (optionnel)</label>
-            <textarea id="message" [(ngModel)]="form.message" name="message"
-              placeholder="Décrivez brièvement votre situation ou vos questions..."></textarea>
-          </div>
+          <!-- Créneaux du jour sélectionné -->
+          @if (selectedDate()) {
+            <div class="slots-panel">
+              <h3 class="slots-panel__title">
+                {{ formatDate(selectedDate()!) }}
+              </h3>
 
-          <button type="submit" class="btn btn-terracotta booking-submit" [disabled]="loading()">
-            @if (loading()) {
-              <span>Envoi en cours...</span>
-            } @else {
-              <span>Envoyer ma demande</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            }
-          </button>
-        </form>
+              @if (slotsForDate().length === 0) {
+                <p class="slots-panel__empty">Aucun créneau disponible ce jour.</p>
+              } @else {
+                <div class="slots-grid">
+                  @for (slot of slotsForDate(); track slot.id) {
+                    <button
+                      class="slot-btn"
+                      [class.slot-btn--selected]="selectedSlot()?.id === slot.id"
+                      [class.slot-btn--booked]="slot.booked"
+                      [disabled]="slot.booked"
+                      (click)="selectSlot(slot)"
+                    >
+                      {{ formatTime(slot.start_time) }} – {{ formatTime(slot.end_time) }}
+                      @if (slot.booked) { <span class="slot-btn__tag">Réservé</span> }
+                    </button>
+                  }
+                </div>
+              }
+
+              <!-- CTA après sélection d'un slot -->
+              @if (selectedSlot()) {
+                <div class="slots-panel__cta">
+                  @if (!auth.isLoggedIn) {
+                    <p class="slots-panel__auth-notice">
+                      Connectez-vous pour confirmer ce créneau.
+                    </p>
+                  } @else {
+                    <button class="btn btn-terracotta" (click)="proceedToForm()">
+                      Continuer →
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+
+        <!-- Auth si non connecté -->
+        @if (!auth.isLoggedIn) {
+          <div class="booking-card booking-card--auth">
+            <div class="auth-tabs">
+              <button class="auth-tab" [class.active]="authMode() === 'login'" (click)="authMode.set('login')">Se connecter</button>
+              <button class="auth-tab" [class.active]="authMode() === 'register'" (click)="authMode.set('register')">Créer un compte</button>
+            </div>
+
+            @if (error()) { <div class="alert alert--error">{{ error() }}</div> }
+            @if (success()) { <div class="alert alert--success">{{ success() }}</div> }
+
+            <form (ngSubmit)="onAuth()" class="auth-form">
+              @if (authMode() === 'register') {
+                <div class="form-group">
+                  <label for="fullName">Nom complet</label>
+                  <input id="fullName" type="text" [(ngModel)]="authForm.fullName" name="fullName" required placeholder="Votre nom" />
+                </div>
+              }
+              <div class="form-group">
+                <label for="email">Courriel</label>
+                <input id="email" type="email" [(ngModel)]="authForm.email" name="email" required placeholder="votre@email.com" />
+              </div>
+              <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input id="password" type="password" [(ngModel)]="authForm.password" name="password" required placeholder="••••••••" />
+              </div>
+              <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading()">
+                {{ authMode() === 'login' ? 'Se connecter' : 'Créer mon compte' }}
+              </button>
+            </form>
+          </div>
+        }
       }
+
+      <!-- ── ÉTAPE 2: FORMULAIRE ── -->
+      @if (step() === 'form') {
+        <div class="booking-card">
+          <button class="back-btn" (click)="backToCalendar()">← Retour</button>
+          <h2>Confirmer le rendez-vous</h2>
+
+          <div class="booking-summary">
+            <div class="booking-summary__item">
+              <span>📅</span>
+              <span>{{ formatDate(selectedSlot()!.slot_date) }}</span>
+            </div>
+            <div class="booking-summary__item">
+              <span>🕐</span>
+              <span>{{ formatTime(selectedSlot()!.start_time) }} – {{ formatTime(selectedSlot()!.end_time) }}</span>
+            </div>
+          </div>
+
+          @if (error()) { <div class="alert alert--error">{{ error() }}</div> }
+
+          <form (ngSubmit)="confirmBooking()" class="booking-form">
+            <div class="form-group">
+              <label for="service">Service souhaité *</label>
+              <select id="service" [(ngModel)]="bookingForm.service" name="service" required>
+                <option value="">Choisir un service...</option>
+                @for (s of services; track s) {
+                  <option [value]="s">{{ s }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="message">Message (optionnel)</label>
+              <textarea id="message" [(ngModel)]="bookingForm.message" name="message"
+                placeholder="Décrivez brièvement votre situation..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading() || !bookingForm.service">
+              @if (loading()) { Envoi en cours... } @else { Confirmer le rendez-vous }
+            </button>
+          </form>
+        </div>
+      }
+
+      <!-- ── ÉTAPE 3: CONFIRMATION ── -->
+      @if (step() === 'confirm') {
+        <div class="booking-card booking-card--success">
+          <div class="success-icon">🌿</div>
+          <h2>Rendez-vous demandé !</h2>
+          <p>Votre demande a été envoyée. Anny vous contactera dans les 24 heures pour confirmer.</p>
+          <div class="success-actions">
+            <button class="btn btn-outline" (click)="backToCalendar()">Retour au calendrier</button>
+            <button class="btn btn-terracotta" (click)="showMyBookings()">Voir mes rendez-vous</button>
+          </div>
+        </div>
+      }
+
+      <!-- ── MES RENDEZ-VOUS ── -->
+      @if (step() === 'my-bookings') {
+        <div class="booking-card">
+          <button class="back-btn" (click)="backToCalendar()">← Retour</button>
+          <h2>Mes rendez-vous</h2>
+
+          @if (myBookings().length === 0) {
+            <p class="empty-state">Vous n'avez aucun rendez-vous pour le moment.</p>
+          } @else {
+            <div class="my-bookings-list">
+              @for (b of myBookings(); track b.id) {
+                <div class="my-booking-item" [class.my-booking-item--cancelled]="b.status === 'cancelled'">
+                  <div class="my-booking-item__info">
+                    <strong>{{ b.service_name }}</strong>
+                    @if (b.availability_slots) {
+                      <span>{{ formatDate(b.availability_slots.slot_date) }}</span>
+                      <span>{{ formatTime(b.availability_slots.start_time) }} – {{ formatTime(b.availability_slots.end_time) }}</span>
+                    }
+                  </div>
+                  <div class="my-booking-item__right">
+                    <span class="status-badge" [class]="'status-badge--' + b.status">
+                      {{ statusLabel(b.status) }}
+                    </span>
+                    @if (b.status !== 'cancelled') {
+                      <button class="btn-link btn-link--danger" (click)="cancelBooking(b.id)">Annuler</button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
     </div>
 
-    <!-- Info sidebar -->
-    <aside class="booking-info">
-      <div class="booking-info__card card">
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="booking-sidebar">
+      <div class="booking-card booking-card--info">
         <h3>Informations pratiques</h3>
-        <ul>
-          <li>
-            <span class="booking-info__icon">📍</span>
-            <div>
-              <strong>Région Sorel-Tracy</strong>
-              <span>Consultations en personne ou en ligne</span>
-            </div>
-          </li>
-          <li>
-            <span class="booking-info__icon">📞</span>
-            <div>
-              <strong>Téléphone</strong>
-              <a href="tel:4508992529">450-899-2529</a>
-            </div>
-          </li>
-          <li>
-            <span class="booking-info__icon">⏰</span>
-            <div>
-              <strong>Délai de réponse</strong>
-              <span>Dans les 24 heures</span>
-            </div>
-          </li>
-          <li>
-            <span class="booking-info__icon">💰</span>
-            <div>
-              <strong>Tarif</strong>
-              <span>À partir de 70 $ / séance</span>
-            </div>
-          </li>
+        <ul class="info-list">
+          <li><span>📍</span><div><strong>Région Sorel-Tracy</strong><span>En personne ou en ligne</span></div></li>
+          <li><span>📞</span><div><strong>Téléphone</strong><a href="tel:4508992529">450-899-2529</a></div></li>
+          <li><span>⏰</span><div><strong>Durée</strong><span>60 minutes / séance</span></div></li>
+          <li><span>💰</span><div><strong>Tarif</strong><span>À partir de 70 $ / séance</span></div></li>
+          <li><span>✅</span><div><strong>Confirmation</strong><span>Dans les 24 heures</span></div></li>
         </ul>
       </div>
 
-      <div class="booking-info__quote">
-        <blockquote>
-          "Pas à pas, vers plus de clarté, d'autonomie et de sens."
-        </blockquote>
+      @if (auth.isLoggedIn) {
+        <div class="booking-card booking-card--user">
+          <p>Connecté en tant que<br><strong>{{ auth.currentUser()?.email }}</strong></p>
+          <button class="btn-link" (click)="auth.signOut()">Se déconnecter</button>
+        </div>
+      }
+
+      <div class="booking-card booking-card--quote">
+        <blockquote>"Pas à pas, vers plus de clarté, d'autonomie et de sens."</blockquote>
         <cite>— Anny Williams</cite>
       </div>
     </aside>

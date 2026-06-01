@@ -1,7 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../services/supabase.service';
+import { AuthService } from '../../services/auth.service';
+import { CalendarService, AvailabilitySlot, Booking } from '../../services/calendar.service';
+
+type BookingStep = 'calendar' | 'form' | 'confirm' | 'my-bookings';
+type AuthMode = 'login' | 'register';
 
 @Component({
   selector: 'app-booking',
@@ -10,14 +14,34 @@ import { SupabaseService } from '../../services/supabase.service';
   templateUrl: './booking.html',
   styleUrl: './booking.scss'
 })
-export class BookingComponent {
-  form = {
-    name: '',
-    email: '',
-    phone: '',
+export class BookingComponent implements OnInit, OnDestroy {
+  auth    = inject(AuthService);
+  calSvc  = inject(CalendarService);
+
+  // ── State ──────────────────────────────────────────────────
+  step         = signal<BookingStep>('calendar');
+  authMode     = signal<AuthMode>('login');
+  loading      = signal(false);
+  error        = signal('');
+  success      = signal('');
+
+  // ── Calendar ───────────────────────────────────────────────
+  today        = new Date();
+  viewYear     = signal(this.today.getFullYear());
+  viewMonth    = signal(this.today.getMonth() + 1); // 1-12
+  slots        = signal<AvailabilitySlot[]>([]);
+  selectedDate = signal<string | null>(null);
+  selectedSlot = signal<AvailabilitySlot | null>(null);
+  myBookings   = signal<Booking[]>([]);
+  private realtimeSub: any;
+
+  // ── Auth form ──────────────────────────────────────────────
+  authForm = { email: '', password: '', fullName: '' };
+
+  // ── Booking form ───────────────────────────────────────────
+  bookingForm = {
     service: '',
-    message: '',
-    preferred_date: ''
+    message: ''
   };
 
   services = [
@@ -28,38 +52,212 @@ export class BookingComponent {
     'Autre / À discuter'
   ];
 
-  loading = signal(false);
-  success = signal(false);
-  error   = signal('');
+  // ── Computed ───────────────────────────────────────────────
+  monthLabel = computed(() => {
+    return new Date(this.viewYear(), this.viewMonth() - 1, 1)
+      .toLocaleDateString('fr-CA', { month: 'long', year: 'numeric' });
+  });
 
-  constructor(private supabase: SupabaseService) {}
+  calendarDays = computed(() => {
+    const year  = this.viewYear();
+    const month = this.viewMonth();
+    const first = new Date(year, month - 1, 1);
+    const last  = new Date(year, month, 0);
 
-  async onSubmit() {
-    if (!this.form.name || !this.form.email || !this.form.service) return;
+    // Padding avant le 1er (lundi = 0)
+    const startDow = (first.getDay() + 6) % 7; // 0=lundi
+    const days: Array<{ date: string | null; dayNum: number | null }> = [];
 
+    for (let i = 0; i < startDow; i++) days.push({ date: null, dayNum: null });
+    for (let d = 1; d <= last.getDate(); d++) {
+      const date = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      days.push({ date, dayNum: d });
+    }
+    return days;
+  });
+
+  slotsForDate = computed(() => {
+    const date = this.selectedDate();
+    if (!date) return [];
+    return this.slots().filter(s => s.slot_date === date);
+  });
+
+  datesWithSlots = computed(() => {
+    const available = new Set<string>();
+    const booked    = new Set<string>();
+    this.slots().forEach(s => {
+      if (s.booked) booked.add(s.slot_date);
+      else available.add(s.slot_date);
+    });
+    return { available, booked };
+  });
+
+  // ── Lifecycle ──────────────────────────────────────────────
+  async ngOnInit() {
+    await this.loadSlots();
+    this.subscribeRealtime();
+  }
+
+  ngOnDestroy() {
+    if (this.realtimeSub) {
+      this.calSvc['supabase'].client.removeChannel(this.realtimeSub);
+    }
+  }
+
+  // ── Calendar navigation ────────────────────────────────────
+  prevMonth() {
+    if (this.viewMonth() === 1) {
+      this.viewMonth.set(12);
+      this.viewYear.update(y => y - 1);
+    } else {
+      this.viewMonth.update(m => m - 1);
+    }
+    this.selectedDate.set(null);
+    this.selectedSlot.set(null);
+    this.loadSlots();
+  }
+
+  nextMonth() {
+    if (this.viewMonth() === 12) {
+      this.viewMonth.set(1);
+      this.viewYear.update(y => y + 1);
+    } else {
+      this.viewMonth.update(m => m + 1);
+    }
+    this.selectedDate.set(null);
+    this.selectedSlot.set(null);
+    this.loadSlots();
+  }
+
+  async loadSlots() {
     this.loading.set(true);
-    this.error.set('');
-
     try {
-      await this.supabase.client
-        .from('bookings')
-        .insert([{
-          name:           this.form.name,
-          email:          this.form.email,
-          phone:          this.form.phone || null,
-          service_name:   this.form.service,
-          message:        this.form.message || null,
-          preferred_date: this.form.preferred_date || null,
-          status:         'pending'
-        }]);
-
-      this.success.set(true);
-      this.form = { name: '', email: '', phone: '', service: '', message: '', preferred_date: '' };
-    } catch (err: any) {
-      this.error.set('Une erreur est survenue. Veuillez réessayer ou nous contacter par téléphone.');
-      console.error(err);
+      const data = await this.calSvc.getSlotsForMonth(this.viewYear(), this.viewMonth());
+      this.slots.set(data);
+    } catch (e: any) {
+      this.error.set(e.message);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  subscribeRealtime() {
+    this.realtimeSub = this.calSvc.subscribeToSlotChanges(
+      this.viewYear(), this.viewMonth(),
+      () => this.loadSlots()
+    );
+  }
+
+  // ── Day / slot selection ───────────────────────────────────
+  selectDate(date: string | null) {
+    if (!date) return;
+    const hasSlots = this.slots().some(s => s.slot_date === date && !s.booked);
+    if (!hasSlots) return;
+    this.selectedDate.set(date);
+    this.selectedSlot.set(null);
+  }
+
+  selectSlot(slot: AvailabilitySlot) {
+    if (slot.booked) return;
+    this.selectedSlot.set(slot);
+  }
+
+  getDayClass(date: string | null): string {
+    if (!date) return 'cal__day--empty';
+    const { available, booked } = this.datesWithSlots();
+    const today = new Date().toISOString().split('T')[0];
+    if (date < today) return 'cal__day--past';
+    if (date === this.selectedDate()) return 'cal__day--selected';
+    if (available.has(date)) return 'cal__day--available';
+    if (booked.has(date) && !available.has(date)) return 'cal__day--full';
+    return 'cal__day--no-slot';
+  }
+
+  // ── Auth ───────────────────────────────────────────────────
+  async onAuth() {
+    this.loading.set(true);
+    this.error.set('');
+    try {
+      if (this.authMode() === 'register') {
+        await this.auth.signUp(this.authForm.email, this.authForm.password, this.authForm.fullName);
+        this.success.set('Compte créé ! Vérifiez votre courriel pour confirmer.');
+      } else {
+        await this.auth.signIn(this.authForm.email, this.authForm.password);
+      }
+    } catch (e: any) {
+      this.error.set(e.message);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // ── Booking ────────────────────────────────────────────────
+  proceedToForm() {
+    if (!this.selectedSlot()) return;
+    if (!this.auth.isLoggedIn) return;
+    this.step.set('form');
+    this.error.set('');
+  }
+
+  async confirmBooking() {
+    const slot = this.selectedSlot();
+    if (!slot || !this.bookingForm.service) return;
+
+    this.loading.set(true);
+    this.error.set('');
+    try {
+      await this.calSvc.bookSlot(slot.id, this.bookingForm.service, this.bookingForm.message);
+      this.step.set('confirm');
+      await this.loadSlots();
+    } catch (e: any) {
+      this.error.set(e.message);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // ── My bookings ────────────────────────────────────────────
+  async showMyBookings() {
+    this.loading.set(true);
+    try {
+      const data = await this.calSvc.getMyBookings();
+      this.myBookings.set(data);
+      this.step.set('my-bookings');
+    } catch (e: any) {
+      this.error.set(e.message);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async cancelBooking(id: number) {
+    if (!confirm('Annuler ce rendez-vous ?')) return;
+    try {
+      await this.calSvc.cancelBooking(id);
+      await this.showMyBookings();
+    } catch (e: any) {
+      this.error.set(e.message);
+    }
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
+  formatTime(t: string) {
+    return t.substring(0, 5);
+  }
+
+  formatDate(d: string) {
+    return new Date(d + 'T12:00:00').toLocaleDateString('fr-CA', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+
+  statusLabel(s: string) {
+    return { pending: 'En attente', confirmed: 'Confirmé', cancelled: 'Annulé' }[s] ?? s;
+  }
+
+  backToCalendar() {
+    this.step.set('calendar');
+    this.error.set('');
+    this.success.set('');
   }
 }
