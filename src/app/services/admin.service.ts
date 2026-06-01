@@ -27,12 +27,16 @@ export class AdminService {
   private supabase = inject(SupabaseService);
 
   async isAdmin(): Promise<boolean> {
-    const { data } = await this.supabase.client.auth.getSession();
-    const meta = data.session?.user?.app_metadata;
+    // Force refresh du token pour avoir les app_metadata à jour
+    const { data: refreshed } = await this.supabase.client.auth.refreshSession();
+    const meta = refreshed.session?.user?.app_metadata;
     return meta?.['role'] === 'admin';
   }
 
   async getAllBookings(status?: string): Promise<AdminBooking[]> {
+    // Refresh session pour s'assurer que le JWT admin est valide
+    await this.supabase.client.auth.refreshSession();
+
     let query = this.supabase.client
       .from('bookings')
       .select(`

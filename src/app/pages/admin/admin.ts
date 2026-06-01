@@ -47,7 +47,9 @@ export class AdminComponent implements OnInit {
     try {
       const data = await this.adminSvc.getAllBookings(this.filter());
       this.bookings.set(data);
+      console.log('Bookings loaded:', data.length, data);
     } catch (e: any) {
+      console.error('Load bookings error:', e);
       this.error.set(e.message);
     } finally {
       this.loading.set(false);
