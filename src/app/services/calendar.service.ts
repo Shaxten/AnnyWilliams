@@ -44,13 +44,12 @@ export class CalendarService {
     if (slotsErr) throw slotsErr;
     if (!slots?.length) return [];
 
-    // Récupère les bookings existants pour ces slots
+    // Récupère les slots réservés via la vue publique (slot_id seulement, sans données perso)
     const slotIds = slots.map(s => s.id);
     const { data: bookings, error: bookErr } = await this.supabase.client
-      .from('bookings')
+      .from('booked_slots')
       .select('slot_id')
-      .in('slot_id', slotIds)
-      .neq('status', 'cancelled');
+      .in('slot_id', slotIds);
 
     if (bookErr) throw bookErr;
 
@@ -94,14 +93,18 @@ export class CalendarService {
     return data;
   }
 
-  // Récupère les réservations de l'utilisateur connecté
+  // Récupère les réservations de l'utilisateur connecté seulement
   async getMyBookings(): Promise<Booking[]> {
+    const { data: { user } } = await this.supabase.client.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await this.supabase.client
       .from('bookings')
       .select(`
         *,
         availability_slots (slot_date, start_time, end_time)
       `)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
