@@ -1,0 +1,124 @@
+<div class="page-hero">
+  <div class="container">
+    <span class="eyebrow">Première étape</span>
+    <h1>Prendre rendez-vous</h1>
+    <div class="divider"></div>
+    <p>Remplissez ce formulaire et je vous contacterai dans les 24 heures.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container booking-layout">
+
+    <!-- Form -->
+    <div class="booking-form-wrap">
+      @if (success()) {
+        <div class="booking-success">
+          <div class="booking-success__icon">🌿</div>
+          <h3>Demande envoyée !</h3>
+          <p>Merci pour votre message. Je vous contacterai dans les 24 heures pour confirmer votre rendez-vous.</p>
+        </div>
+      } @else {
+        <form class="booking-form" (ngSubmit)="onSubmit()" #f="ngForm">
+          <h2>Votre demande</h2>
+
+          @if (error()) {
+            <div class="booking-error">{{ error() }}</div>
+          }
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Nom complet *</label>
+              <input id="name" type="text" [(ngModel)]="form.name" name="name" required placeholder="Votre nom" />
+            </div>
+            <div class="form-group">
+              <label for="email">Courriel *</label>
+              <input id="email" type="email" [(ngModel)]="form.email" name="email" required placeholder="votre@email.com" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Téléphone</label>
+              <input id="phone" type="tel" [(ngModel)]="form.phone" name="phone" placeholder="450-000-0000" />
+            </div>
+            <div class="form-group">
+              <label for="date">Date préférée</label>
+              <input id="date" type="date" [(ngModel)]="form.preferred_date" name="preferred_date" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="service">Service souhaité *</label>
+            <select id="service" [(ngModel)]="form.service" name="service" required>
+              <option value="">Choisir un service...</option>
+              @for (s of services; track s) {
+                <option [value]="s">{{ s }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message (optionnel)</label>
+            <textarea id="message" [(ngModel)]="form.message" name="message"
+              placeholder="Décrivez brièvement votre situation ou vos questions..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-terracotta booking-submit" [disabled]="loading()">
+            @if (loading()) {
+              <span>Envoi en cours...</span>
+            } @else {
+              <span>Envoyer ma demande</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            }
+          </button>
+        </form>
+      }
+    </div>
+
+    <!-- Info sidebar -->
+    <aside class="booking-info">
+      <div class="booking-info__card card">
+        <h3>Informations pratiques</h3>
+        <ul>
+          <li>
+            <span class="booking-info__icon">📍</span>
+            <div>
+              <strong>Région Sorel-Tracy</strong>
+              <span>Consultations en personne ou en ligne</span>
+            </div>
+          </li>
+          <li>
+            <span class="booking-info__icon">📞</span>
+            <div>
+              <strong>Téléphone</strong>
+              <a href="tel:4508992529">450-899-2529</a>
+            </div>
+          </li>
+          <li>
+            <span class="booking-info__icon">⏰</span>
+            <div>
+              <strong>Délai de réponse</strong>
+              <span>Dans les 24 heures</span>
+            </div>
+          </li>
+          <li>
+            <span class="booking-info__icon">💰</span>
+            <div>
+              <strong>Tarif</strong>
+              <span>À partir de 70 $ / séance</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="booking-info__quote">
+        <blockquote>
+          "Pas à pas, vers plus de clarté, d'autonomie et de sens."
+        </blockquote>
+        <cite>— Anny Williams</cite>
+      </div>
+    </aside>
+
+  </div>
+</section>

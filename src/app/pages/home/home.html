@@ -1,0 +1,150 @@
+<!-- ── HERO ── -->
+<section class="hero">
+  <!-- Decorative birds -->
+  <svg class="hero__bird hero__bird--1" viewBox="0 0 60 30" fill="none" aria-hidden="true">
+    <path d="M0 15 Q15 0 30 15 Q45 0 60 15" stroke="currentColor" stroke-width="1.5" fill="none"/>
+  </svg>
+  <svg class="hero__bird hero__bird--2" viewBox="0 0 40 20" fill="none" aria-hidden="true">
+    <path d="M0 10 Q10 0 20 10 Q30 0 40 10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+  </svg>
+  <svg class="hero__bird hero__bird--3" viewBox="0 0 50 25" fill="none" aria-hidden="true">
+    <path d="M0 12 Q12 0 25 12 Q37 0 50 12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+  </svg>
+
+  <!-- Decorative leaves -->
+  <svg class="hero__leaf hero__leaf--tl" viewBox="0 0 80 140" fill="none" aria-hidden="true">
+    <path d="M40 130 C10 100 5 50 25 15 C32 35 37 80 40 130Z" fill="currentColor"/>
+    <path d="M40 130 C70 100 75 50 55 15 C48 35 43 80 40 130Z" fill="currentColor" opacity=".5"/>
+    <line x1="40" y1="15" x2="40" y2="130" stroke="currentColor" stroke-width="1" opacity=".4"/>
+  </svg>
+  <svg class="hero__leaf hero__leaf--br" viewBox="0 0 80 140" fill="none" aria-hidden="true">
+    <path d="M40 130 C10 100 5 50 25 15 C32 35 37 80 40 130Z" fill="currentColor"/>
+    <path d="M40 130 C70 100 75 50 55 15 C48 35 43 80 40 130Z" fill="currentColor" opacity=".5"/>
+    <line x1="40" y1="15" x2="40" y2="130" stroke="currentColor" stroke-width="1" opacity=".4"/>
+  </svg>
+
+  <div class="hero__content container">
+    <div class="hero__text" data-reveal>
+      <span class="eyebrow">Coach & Intervenante · Région Sorel</span>
+      <h1 class="hero__title">
+        Une voix pour s'exprimer,<br>
+        <em>un espace pour grandir.</em>
+      </h1>
+      <p class="hero__subtitle">
+        Anny Williams vous accompagne avec bienveillance dans votre développement personnel,
+        l'intervention en langage et la connaissance de soi.
+      </p>
+      <div class="hero__actions">
+        <a routerLink="/reservation" class="btn btn-terracotta">Prendre rendez-vous</a>
+        <a routerLink="/services" class="btn btn-outline">Découvrir les services</a>
+      </div>
+    </div>
+
+    <div class="hero__quote" data-reveal="right" data-reveal-delay="200">
+      <blockquote>
+        "Investir en soi est le plus précieux des investissements."
+      </blockquote>
+      <cite>— Anny Williams</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section class="section services-section">
+  <div class="container">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Ce que je propose</span>
+      <h2>Consultation personnalisée</h2>
+      <div class="divider"></div>
+      <p>Des services adaptés à vos besoins, offerts avec professionnalisme et bienveillance.</p>
+    </div>
+
+    <div class="services-grid">
+      @for (service of services; track service.title; let i = $index) {
+        <div class="service-card card" data-reveal [attr.data-reveal-delay]="i * 100">
+          <div class="service-card__icon">{{ service.icon }}</div>
+          <h3>{{ service.title }}</h3>
+          <p>{{ service.desc }}</p>
+          <a [routerLink]="service.link" class="service-card__link">
+            En savoir plus
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT STRIP ── -->
+<section class="about-strip">
+  <!-- Leaf deco -->
+  <svg class="about-strip__leaf" viewBox="0 0 100 180" fill="none" aria-hidden="true">
+    <path d="M50 170 C15 130 8 60 35 15 C43 40 48 100 50 170Z" fill="currentColor"/>
+    <path d="M50 170 C85 130 92 60 65 15 C57 40 52 100 50 170Z" fill="currentColor" opacity=".5"/>
+    <line x1="50" y1="15" x2="50" y2="170" stroke="currentColor" stroke-width="1.5" opacity=".4"/>
+  </svg>
+
+  <div class="container about-strip__inner">
+    <div class="about-strip__text" data-reveal="left">
+      <span class="eyebrow">À propos</span>
+      <h2>Une approche humaine et professionnelle</h2>
+      <p>
+        Anny Williams est une coach en développement personnel passionnée par l'accompagnement
+        des individus à tous les stades de leur vie. Avec une approche bienveillante et
+        professionnelle, elle s'engage à vous aider à surmonter les obstacles, à réaliser
+        vos objectifs et à vous épanouir pleinement.
+      </p>
+      <p>
+        Mon objectif est de vous accompagner vers une meilleure version de vous-même,
+        de renforcer votre confiance en vous et de vous aider à atteindre un équilibre
+        personnel harmonieux.
+      </p>
+      <a routerLink="/a-propos" class="btn btn-outline" style="margin-top:.5rem">
+        En savoir plus sur moi
+      </a>
+    </div>
+    <div class="about-strip__image" data-reveal="right" data-reveal-delay="200">
+      <div class="about-strip__img-frame">
+        <div class="about-strip__img-placeholder">
+          <!-- Image placeholder — remplacer par une vraie photo -->
+          <svg viewBox="0 0 200 200" fill="none" width="80" aria-hidden="true">
+            <circle cx="100" cy="80" r="40" stroke="currentColor" stroke-width="2" opacity=".3"/>
+            <path d="M40 180 C40 140 160 140 160 180" stroke="currentColor" stroke-width="2" opacity=".3"/>
+          </svg>
+          <span>Photo d'Anny</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUOTE BANNER ── -->
+<section class="quote-banner">
+  <div class="container">
+    <blockquote data-reveal="fade">
+      "Une voix pour s'exprimer, une main pour être soutenu, un espace pour grandir."
+    </blockquote>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="section cta-section">
+  <div class="container">
+    <div class="cta-box" data-reveal>
+      <!-- Birds deco -->
+      <svg class="cta-box__bird" viewBox="0 0 80 40" fill="none" aria-hidden="true">
+        <path d="M0 20 Q20 0 40 20 Q60 0 80 20" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+      <span class="eyebrow">Prêt·e à commencer ?</span>
+      <h2>Réservez votre première consultation</h2>
+      <p>Un premier échange pour mieux vous connaître et définir ensemble vos besoins.</p>
+      <div class="cta-box__actions">
+        <a routerLink="/reservation" class="btn btn-terracotta">Prendre rendez-vous</a>
+        <a href="tel:4508992529" class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          450-899-2529
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,40 @@
+<header class="header" [class.scrolled]="scrolled()">
+  <div class="header__inner container">
+
+    <!-- Logo -->
+    <a routerLink="/" class="header__logo" (click)="closeMenu()">
+      <span class="header__logo-name">Anny Williams</span>
+      <span class="header__logo-sub">Coach & Intervenante</span>
+    </a>
+
+    <!-- Nav desktop -->
+    <nav class="header__nav" aria-label="Navigation principale">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">Accueil</a>
+      <a routerLink="/services" routerLinkActive="active" (click)="closeMenu()">Services</a>
+      <a routerLink="/tarifs" routerLinkActive="active" (click)="closeMenu()">Tarifs</a>
+      <a routerLink="/a-propos" routerLinkActive="active" (click)="closeMenu()">À propos</a>
+    </nav>
+
+    <!-- CTA -->
+    <a routerLink="/reservation" class="btn btn-terracotta header__cta" (click)="closeMenu()">
+      Prendre rendez-vous
+    </a>
+
+    <!-- Hamburger -->
+    <button class="header__burger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+  </div>
+
+  <!-- Mobile nav -->
+  <div class="header__mobile" [class.open]="menuOpen()">
+    <nav>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMenu()">Accueil</a>
+      <a routerLink="/services" routerLinkActive="active" (click)="closeMenu()">Services</a>
+      <a routerLink="/tarifs" routerLinkActive="active" (click)="closeMenu()">Tarifs</a>
+      <a routerLink="/a-propos" routerLinkActive="active" (click)="closeMenu()">À propos</a>
+      <a routerLink="/reservation" class="btn btn-terracotta" (click)="closeMenu()">Prendre rendez-vous</a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,47 @@
+<div class="page-hero">
+  <div class="container">
+    <span class="eyebrow" data-reveal>Investir en soi</span>
+    <h1 data-reveal data-reveal-delay="100">Tarifs</h1>
+    <div class="divider" data-reveal data-reveal-delay="200"></div>
+    <p data-reveal data-reveal-delay="300">Des tarifs transparents pour des services de qualité.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="pricing-grid">
+      @for (plan of plans; track plan.title; let i = $index) {
+        <div class="pricing-card card" [class.pricing-card--highlight]="plan.highlight"
+             data-reveal [attr.data-reveal-delay]="i * 100">
+          @if (plan.highlight) {
+            <div class="pricing-card__badge">Populaire</div>
+          }
+          <h3>{{ plan.title }}</h3>
+          <div class="pricing-card__price">
+            <span class="pricing-card__amount">{{ plan.price }}</span>
+            @if (plan.unit) {
+              <span class="pricing-card__unit">{{ plan.unit }}</span>
+            }
+          </div>
+          <p class="pricing-card__desc">{{ plan.desc }}</p>
+          <ul class="pricing-card__features">
+            @for (f of plan.features; track f) {
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ f }}
+              </li>
+            }
+          </ul>
+          <a routerLink="/reservation" class="btn" [class.btn-terracotta]="plan.highlight" [class.btn-outline]="!plan.highlight">
+            {{ plan.cta }}
+          </a>
+        </div>
+      }
+    </div>
+
+    <p class="pricing-note" data-reveal>
+      * Les tarifs peuvent varier selon la durée et la fréquence des séances.
+      N'hésitez pas à me contacter pour discuter d'un programme adapté à vos besoins.
+    </p>
+  </div>
+</section>

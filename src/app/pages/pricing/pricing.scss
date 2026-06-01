@@ -1,0 +1,104 @@
+.page-hero {
+  background: var(--beige-mid);
+  padding: 8rem 0 4rem;
+  text-align: center;
+  border-bottom: 1px solid var(--beige-dark);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+}
+
+.pricing-card {
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+
+  &--highlight {
+    background: var(--sage-dark);
+    border-color: var(--sage-dark);
+
+    h3, .pricing-card__amount, .pricing-card__features li { color: var(--white); }
+    .pricing-card__unit, .pricing-card__desc { color: rgba(255,255,255,.75); }
+    .pricing-card__features svg { stroke: var(--sage-light); }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--terracotta);
+    color: var(--white);
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: .3rem .85rem;
+    border-radius: 20px;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 500;
+  }
+
+  &__price {
+    display: flex;
+    align-items: baseline;
+    gap: .4rem;
+  }
+
+  &__amount {
+    font-family: var(--font-serif);
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  &__unit {
+    font-size: .82rem;
+    color: var(--text-muted);
+  }
+
+  &__desc {
+    font-size: .88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  &__features {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    flex: 1;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .88rem;
+      color: var(--text-muted);
+
+      svg { flex-shrink: 0; stroke: var(--sage-dark); }
+    }
+  }
+
+  .btn { margin-top: .5rem; justify-content: center; }
+}
+
+.pricing-note {
+  text-align: center;
+  font-size: .82rem;
+  color: var(--text-muted);
+  margin-top: 2.5rem;
+  font-style: italic;
+}
