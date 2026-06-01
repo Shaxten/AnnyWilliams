@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CalendarService, AvailabilitySlot, Booking } from '../../services/calendar.service';
+import { SupabaseService } from '../../services/supabase.service';
 
-type BookingStep = 'calendar' | 'form' | 'confirm' | 'my-bookings';
+type BookingStep = 'calendar' | 'form' | 'confirm' | 'my-bookings' | 'profile';
 type AuthMode = 'login' | 'register';
 
 @Component({
@@ -15,8 +16,9 @@ type AuthMode = 'login' | 'register';
   styleUrl: './booking.scss'
 })
 export class BookingComponent implements OnInit, OnDestroy {
-  auth    = inject(AuthService);
-  calSvc  = inject(CalendarService);
+  auth      = inject(AuthService);
+  calSvc    = inject(CalendarService);
+  supabase  = inject(SupabaseService);
 
   // ── State ──────────────────────────────────────────────────
   step         = signal<BookingStep>('calendar');
@@ -24,6 +26,10 @@ export class BookingComponent implements OnInit, OnDestroy {
   loading      = signal(false);
   error        = signal('');
   success      = signal('');
+
+  // ── Profile ────────────────────────────────────────────────
+  profileForm  = { full_name: '', phone: '' };
+  profileSaved = signal(false);
 
   // ── Calendar ───────────────────────────────────────────────
   today        = new Date();
@@ -96,6 +102,9 @@ export class BookingComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.loadSlots();
     this.subscribeRealtime();
+    if (this.auth.isLoggedIn) {
+      await this.loadProfile();
+    }
   }
 
   ngOnDestroy() {
@@ -183,7 +192,46 @@ export class BookingComponent implements OnInit, OnDestroy {
         this.success.set('Compte créé ! Vérifiez votre courriel pour confirmer.');
       } else {
         await this.auth.signIn(this.authForm.email, this.authForm.password);
+        await this.loadProfile();
       }
+    } catch (e: any) {
+      this.error.set(e.message);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // ── Profile ────────────────────────────────────────────────
+  async loadProfile() {
+    const user = this.auth.currentUser();
+    if (!user) return;
+    const { data } = await this.supabase.client
+      .from('profiles')
+      .select('full_name, phone')
+      .eq('id', user.id)
+      .single();
+    if (data) {
+      this.profileForm.full_name = data.full_name ?? '';
+      this.profileForm.phone     = data.phone ?? '';
+    }
+  }
+
+  async saveProfile() {
+    const user = this.auth.currentUser();
+    if (!user) return;
+    this.loading.set(true);
+    this.error.set('');
+    try {
+      const { error } = await this.supabase.client
+        .from('profiles')
+        .upsert({
+          id:        user.id,
+          full_name: this.profileForm.full_name,
+          phone:     this.profileForm.phone
+        });
+      if (error) throw error;
+      this.profileSaved.set(true);
+      setTimeout(() => this.profileSaved.set(false), 3000);
     } catch (e: any) {
       this.error.set(e.message);
     } finally {

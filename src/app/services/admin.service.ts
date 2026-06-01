@@ -17,9 +17,8 @@ export interface AdminBooking {
   profiles: {
     full_name: string | null;
     phone: string | null;
+    email: string | null;
   } | null;
-  // email from auth — joined via user_id
-  user_email?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -42,7 +41,7 @@ export class AdminService {
       .select(`
         *,
         availability_slots (slot_date, start_time, end_time),
-        profiles!bookings_user_id_profiles_fkey (full_name, phone)
+        profiles!bookings_user_id_profiles_fkey (full_name, phone, email)
       `)
       .order('created_at', { ascending: false });
 

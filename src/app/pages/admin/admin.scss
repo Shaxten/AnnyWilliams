@@ -423,3 +423,16 @@
   color: var(--text-muted);
   font-style: italic;
 }
+
+.booking-row__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .8rem;
+  color: var(--sage-dark);
+  text-decoration: none;
+  transition: color .2s;
+
+  svg { flex-shrink: 0; }
+  &:hover { color: var(--text); text-decoration: underline; }
+}

@@ -12,6 +12,36 @@
     <!-- ══ COLONNE PRINCIPALE ══ -->
     <div class="booking-main">
 
+      <!-- ── ÉTAPE: PROFIL ── -->
+      @if (step() === 'profile') {
+        <div class="booking-card">
+          <button class="back-btn" (click)="backToCalendar()">← Retour</button>
+          <h2>Mon profil</h2>
+          <p style="margin-bottom:1.5rem;font-size:.88rem">Ces informations permettent à Anny de vous contacter facilement.</p>
+
+          @if (error()) { <div class="alert alert--error">{{ error() }}</div> }
+          @if (profileSaved()) { <div class="alert alert--success">Profil sauvegardé ✓</div> }
+
+          <form (ngSubmit)="saveProfile()" class="booking-form">
+            <div class="form-group">
+              <label>Courriel</label>
+              <input type="email" [value]="auth.currentUser()?.email" disabled class="input-disabled" />
+            </div>
+            <div class="form-group">
+              <label for="fullName">Nom complet</label>
+              <input id="fullName" type="text" [(ngModel)]="profileForm.full_name" name="full_name" placeholder="Votre nom complet" />
+            </div>
+            <div class="form-group">
+              <label for="phone">Numéro de téléphone</label>
+              <input id="phone" type="tel" [(ngModel)]="profileForm.phone" name="phone" placeholder="450-000-0000" />
+            </div>
+            <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading()">
+              Sauvegarder
+            </button>
+          </form>
+        </div>
+      }
+
       <!-- ── ÉTAPE 1: CALENDRIER ── -->
       @if (step() === 'calendar') {
         <div class="booking-card">
@@ -19,9 +49,12 @@
           <!-- Header calendrier -->
           <div class="booking-card__header">
             <h2>Choisissez un créneau</h2>
-            @if (auth.isLoggedIn) {
-              <button class="btn-link" (click)="showMyBookings()">Mes rendez-vous →</button>
-            }
+            <div class="booking-card__header-actions">
+              @if (auth.isLoggedIn) {
+                <button class="btn-link" (click)="step.set('profile')">Mon profil</button>
+                <button class="btn-link" (click)="showMyBookings()">Mes rendez-vous →</button>
+              }
+            </div>
           </div>
 
           @if (error()) {
