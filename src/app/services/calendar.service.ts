@@ -64,9 +64,14 @@ export class CalendarService {
 
   // Réserve un slot — utilise une transaction pour éviter les doubles réservations
   async bookSlot(slotId: number, serviceName: string, message?: string): Promise<Booking> {
+    // Récupérer l'utilisateur connecté
+    const { data: { user } } = await this.supabase.client.auth.getUser();
+    if (!user) throw new Error('Vous devez être connecté pour réserver.');
+
     const { data, error } = await this.supabase.client
       .from('bookings')
       .insert([{
+        user_id:      user.id,          // requis par la politique RLS
         slot_id:      slotId,
         service_name: serviceName,
         message:      message ?? null,
