@@ -6,6 +6,31 @@
   <base href="/AnnyWilliams/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- GitHub Pages SPA: restore path from redirect -->
+  <script>
+    (function() {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect !== location.href) {
+        history.replaceState(null, null, redirect);
+      }
+      // Decode path from query string (set by 404.html)
+      var search = location.search;
+      if (search.slice(1,3) === 'p=') {
+        var decoded = search.slice(1).split('&').map(function(s) {
+          return s.replace(/~and~/g, '&');
+        });
+        window.history.replaceState(
+          null, null,
+          location.pathname.slice(0, -1) +
+          (decoded[0] ? '/' + decoded[0].slice(2) : '') +
+          (decoded[1] ? '?' + decoded[1].slice(2) : '') +
+          location.hash
+        );
+      }
+    })();
+  </script>
+
   <!-- SEO de base -->
   <meta name="description" content="Anny Williams, coach en développement personnel et intervenante en langage à Sorel-Tracy. Stimulation du langage pour enfants, relation d'aide et connaissance de soi pour adolescents et adultes. Prenez rendez-vous en ligne.">
   <meta name="keywords" content="coach développement personnel Sorel-Tracy, intervenante langage Sorel, stimulation langage enfant, relation aide adulte Québec, connaissance de soi adolescent, coaching Montérégie">
