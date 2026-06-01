@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -16,9 +16,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -27,15 +24,19 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run build -- --configuration production --base-href /AnnyWilliams/
+      - name: Build
+        run: npm run build -- --configuration production --base-href /AnnyWilliams/
 
-      - uses: actions/configure-pages@v4
+      - name: Add .nojekyll
+        run: touch dist/AnnyWilliams/browser/.nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: dist/AnnyWilliams/browser
-
-      - uses: actions/deploy-pages@v4
-        id: deployment
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/AnnyWilliams/browser
+          publish_branch: gh-pages
+          force_orphan: true
