@@ -1,6 +1,7 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,28 @@ import { CommonModule } from '@angular/common';
   styleUrl: './home.scss'
 })
 export class HomeComponent implements AfterViewInit {
+  constructor(private seo: SeoService) {
+    this.seo.set({
+      title: 'Coach en développement personnel & Intervenante en langage à Sorel-Tracy',
+      description: 'Anny Williams vous accompagne avec bienveillance à Sorel-Tracy. Stimulation du langage pour enfants, relation d\'aide, connaissance de soi pour adolescents et adultes. Prenez rendez-vous dès aujourd\'hui.',
+      keywords: 'coach développement personnel Sorel-Tracy, intervenante langage Sorel, stimulation langage enfant, relation aide Sorel-Tracy, connaissance de soi adolescent adulte, coaching Québec, orthophonie Sorel',
+      canonical: '/',
+      ogType: 'website',
+      schema: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          this.seo.localBusinessSchema(),
+          this.seo.personSchema(),
+          this.seo.faqSchema([
+            { q: 'Quels services offre Anny Williams ?', a: 'Anny Williams offre trois services principaux : la stimulation du langage pour les enfants, la relation d\'aide pour les adultes, et des ateliers de connaissance de soi pour les adolescents et adultes.' },
+            { q: 'Où se trouvent les services d\'Anny Williams ?', a: 'Anny Williams est basée dans la région de Sorel-Tracy, Québec. Les consultations sont disponibles en personne ou en ligne.' },
+            { q: 'Quel est le tarif des consultations ?', a: 'Les consultations débutent à 70 $ par séance. Contactez Anny au 450-899-2529 pour plus d\'informations.' },
+            { q: 'Comment prendre rendez-vous avec Anny Williams ?', a: 'Vous pouvez prendre rendez-vous directement en ligne via le calendrier de réservation sur ce site, ou appeler le 450-899-2529.' }
+          ])
+        ]
+      }
+    });
+  }
 
   services = [
     {

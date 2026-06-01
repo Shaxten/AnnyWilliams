@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-pricing',
@@ -10,6 +11,22 @@ import { CommonModule } from '@angular/common';
   styleUrl: './pricing.scss'
 })
 export class PricingComponent implements AfterViewInit {
+  constructor(private seo: SeoService) {
+    this.seo.set({
+      title: 'Tarifs — Consultations à partir de 70 $ à Sorel-Tracy',
+      description: 'Tarifs transparents pour les services d\'Anny Williams : stimulation du langage, relation d\'aide et connaissance de soi à 70 $ la séance. Région Sorel-Tracy, Québec. Consultations en personne ou en ligne.',
+      keywords: 'tarif coach Sorel-Tracy, prix consultation développement personnel, coût stimulation langage enfant, tarif relation aide Québec, prix atelier connaissance soi, consultation 70 dollars Sorel',
+      canonical: '/tarifs',
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'PriceSpecification',
+        price: '70',
+        priceCurrency: 'CAD',
+        description: 'Tarif par séance de consultation individuelle',
+        eligibleQuantity: { '@type': 'QuantitativeValue', value: 1, unitText: 'séance' }
+      }
+    });
+  }
   plans = [
     {
       title: 'Stimulation du langage',

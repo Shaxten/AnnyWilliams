@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CalendarService, AvailabilitySlot, Booking } from '../../services/calendar.service';
 import { SupabaseService } from '../../services/supabase.service';
+import { SeoService } from '../../services/seo.service';
 
 type BookingStep = 'calendar' | 'form' | 'confirm' | 'my-bookings' | 'profile';
 type AuthMode = 'login' | 'register';
@@ -19,6 +20,22 @@ export class BookingComponent implements OnInit, OnDestroy {
   auth      = inject(AuthService);
   calSvc    = inject(CalendarService);
   supabase  = inject(SupabaseService);
+  private seoSvc = inject(SeoService);
+
+  constructor() {
+    this.seoSvc.set({
+      title: 'Réservation en ligne — Prenez rendez-vous avec Anny Williams',
+      description: 'Réservez votre consultation en ligne avec Anny Williams à Sorel-Tracy. Choisissez votre créneau disponible pour la stimulation du langage, la relation d\'aide ou un atelier de connaissance de soi. Réponse sous 24h.',
+      keywords: 'réservation consultation Sorel-Tracy, prendre rendez-vous coach Sorel, booking en ligne développement personnel, rendez-vous stimulation langage, consultation relation aide Québec',
+      canonical: '/reservation',
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'ReservationPackage',
+        name: 'Réservation de consultation — Anny Williams',
+        provider: { '@type': 'Person', name: 'Anny Williams', telephone: '+14508992529' }
+      }
+    });
+  }
 
   // ── State ──────────────────────────────────────────────────
   step         = signal<BookingStep>('calendar');
