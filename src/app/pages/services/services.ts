@@ -27,7 +27,7 @@ export class ServicesComponent implements AfterViewInit {
             item: this.seo.serviceSchema(
               'Stimulation du langage',
               'Identification des défis langagiers, intervention ciblée selon le plan d\'orthophonie, stimulation globale de l\'enfant et dépistage précoce des troubles de la communication.',
-              '70'
+              '100'
             )
           },
           {
@@ -36,7 +36,7 @@ export class ServicesComponent implements AfterViewInit {
             item: this.seo.serviceSchema(
               'Relation d\'aide',
               'Accompagnement bienveillant pour mettre des mots sur vos émotions, comprendre vos pensées et comportements, et cultiver une harmonie avec vous-même.',
-              '70'
+              '100'
             )
           },
           {
@@ -45,7 +45,7 @@ export class ServicesComponent implements AfterViewInit {
             item: this.seo.serviceSchema(
               'Connaissance de soi',
               'Ateliers individuels pour adolescents et adultes pour explorer, comprendre et avancer vers plus de clarté, d\'autonomie et de sens.',
-              '70'
+              '100'
             )
           }
         ]

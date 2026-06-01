@@ -26,7 +26,7 @@ export class HomeComponent implements AfterViewInit {
           this.seo.faqSchema([
             { q: 'Quels services offre Anny Williams ?', a: 'Anny Williams offre trois services principaux : la stimulation du langage pour les enfants, la relation d\'aide pour les adultes, et des ateliers de connaissance de soi pour les adolescents et adultes.' },
             { q: 'Où se trouvent les services d\'Anny Williams ?', a: 'Anny Williams est basée dans la région de Sorel-Tracy, Québec. Les consultations sont disponibles en personne ou en ligne.' },
-            { q: 'Quel est le tarif des consultations ?', a: 'Les consultations débutent à 70 $ par séance. Contactez Anny au 450-899-2529 pour plus d\'informations.' },
+            { q: 'Quel est le tarif des consultations ?', a: 'Les consultations débutent à 100 $ par séance. Contactez Anny au 450-899-2529 pour plus d\'informations.' },
             { q: 'Comment prendre rendez-vous avec Anny Williams ?', a: 'Vous pouvez prendre rendez-vous directement en ligne via le calendrier de réservation sur ce site, ou appeler le 450-899-2529.' }
           ])
         ]
