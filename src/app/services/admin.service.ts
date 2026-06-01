@@ -38,7 +38,7 @@ export class AdminService {
       .select(`
         *,
         availability_slots (slot_date, start_time, end_time),
-        profiles (full_name, phone)
+        profiles!bookings_user_id_profiles_fkey (full_name, phone)
       `)
       .order('created_at', { ascending: false });
 
