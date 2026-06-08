@@ -204,6 +204,10 @@
 
           <form (ngSubmit)="confirmBooking()" class="booking-form">
             <div class="form-group">
+              <label>Courriel de contact</label>
+              <input type="email" [value]="auth.currentUser()?.email" disabled class="input-disabled" />
+            </div>
+            <div class="form-group">
               <label for="service">Service souhaité *</label>
               <select id="service" [(ngModel)]="bookingForm.service" name="service" required>
                 <option value="">Choisir un service...</option>
@@ -287,9 +291,9 @@
     <!-- ══ SIDEBAR ══ -->
     <aside class="booking-sidebar">
       <div class="booking-card booking-card--info">
-        <h3>Informations pratiques</h3>
+        <h3 style="margin-bottom:20px;">Informations pratiques</h3>
         <ul class="info-list">
-          <li><span>📍</span><div><strong>Région Sorel-Tracy</strong><span>En personne ou en ligne</span></div></li>
+          <li><span>📍</span><div><strong>Région Sorel-Tracy</strong><span>En personne, en ligne ou par téléphone</span></div></li>
           <li><span>📞</span><div><strong>Téléphone</strong><a href="tel:4508992529">450-899-2529</a></div></li>
           <li><span>⏰</span><div><strong>Durée</strong><span>60 minutes / séance</span></div></li>
           <li><span>💰</span><div><strong>Tarif</strong><span>92 $ / séance</span></div></li>
