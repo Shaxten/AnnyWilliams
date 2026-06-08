@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../services/seo.service';
 
@@ -9,7 +9,9 @@ import { SeoService } from '../../services/seo.service';
   templateUrl: './services.html',
   styleUrl: './services.scss'
 })
-export class ServicesComponent implements AfterViewInit {
+export class ServicesComponent implements AfterViewInit, OnDestroy {
+  private carouselTimer: any;
+
   constructor(private seo: SeoService) {
     this.seo.set({
       title: 'Services — Stimulation du langage, Relation d\'aide & Connaissance de soi',
@@ -58,5 +60,26 @@ export class ServicesComponent implements AfterViewInit {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
     }, { rootMargin: '0px 0px -60px 0px', threshold: 0.1 });
     setTimeout(() => document.querySelectorAll('[data-reveal]').forEach(el => obs.observe(el)), 100);
+
+    // Auto-carousel: change slide every 3.5s
+    this.initCarousel();
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.carouselTimer);
+  }
+
+  private initCarousel() {
+    const track = document.querySelector('.svc-carousel__track') as HTMLElement;
+    const imgs   = document.querySelectorAll('.svc-carousel__img');
+    if (!track || imgs.length < 2) return;
+
+    let current = 0;
+    const total  = imgs.length;
+
+    this.carouselTimer = setInterval(() => {
+      current = (current + 1) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+    }, 3500);
   }
 }

@@ -29,10 +29,13 @@
       <a routerLink="/reservation" class="btn btn-terracotta" style="margin-top:1rem">Réserver une séance</a>
     </div>
     <div class="service-detail__image" data-reveal="right" data-reveal-delay="200">
-      <div class="service-img-frame">
-        <div class="service-img-placeholder">
-          <span>📚</span>
-          <span>Stimulation du langage</span>
+      <div class="service-img-frame service-img-frame--carousel">
+        <div class="svc-carousel" id="svcCarousel">
+          <div class="svc-carousel__track">
+            <img src="img/eleve1.JPG" alt="Séance de stimulation du langage" width="640" height="800" loading="eager" class="svc-carousel__img" />
+            <img src="img/eleve2.JPG" alt="Intervention en langage avec un enfant" width="640" height="800" loading="lazy"  class="svc-carousel__img" />
+            <img src="img/eleve3.JPG" alt="Activité de stimulation du langage"    width="640" height="800" loading="lazy"  class="svc-carousel__img" />
+          </div>
         </div>
       </div>
     </div>

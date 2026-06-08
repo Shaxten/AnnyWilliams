@@ -87,3 +87,32 @@
     }
   }
 }
+
+/* ── Carousel auto-défilant ───────────────────────────────── */
+.service-img-frame--carousel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.svc-carousel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.svc-carousel__track {
+  display: flex;
+  height: 100%;
+  transition: transform .8s cubic-bezier(.77, 0, .18, 1);
+  will-change: transform;
+}
+
+.svc-carousel__img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
