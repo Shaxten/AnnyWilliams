@@ -488,3 +488,37 @@
   color: var(--text-muted);
   cursor: not-allowed;
 }
+
+/* ── Cancellation policy notice ──────────────────────────── */
+.booking-policy {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  background: rgba(196,120,90,.08);
+  border: 1px solid rgba(196,120,90,.25);
+  border-radius: 8px;
+  padding: .85rem 1rem;
+  margin-top: .5rem;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--terracotta);
+    margin-top: .15rem;
+  }
+
+  p {
+    font-size: .82rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0;
+
+    strong { color: var(--text); }
+  }
+
+  &--form {
+    background: var(--beige-light);
+    border-color: var(--beige-mid);
+
+    svg { color: var(--text-muted); }
+  }
+}

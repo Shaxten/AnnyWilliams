@@ -37,7 +37,7 @@ export class HomeComponent implements AfterViewInit {
   services = [
     {
       icon: '🗣️',
-      title: 'Stimulation du langage',
+      title: "Stratégie d'intervention en développement du langage au début du site",
       desc: 'Identification des défis langagiers et intervention ciblée selon les objectifs du plan d\'orthophonie.',
       link: '/services'
     },

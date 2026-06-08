@@ -220,6 +220,11 @@
             <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading() || !bookingForm.service">
               @if (loading()) { Envoi en cours... } @else { Confirmer le rendez-vous }
             </button>
+
+            <div class="booking-policy booking-policy--form">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p>Annulation gratuite jusqu'à <strong>24h avant</strong> le rendez-vous. Après ce délai, frais de <strong>30 $</strong> applicables.</p>
+            </div>
           </form>
         </div>
       }
@@ -230,6 +235,12 @@
           <div class="success-icon">🌿</div>
           <h2>Rendez-vous demandé !</h2>
           <p>Votre demande a été envoyée. Anny vous contactera dans les 24 heures pour confirmer.</p>
+
+          <div class="booking-policy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <p><strong>Politique d'annulation :</strong> Toute annulation doit être effectuée au moins <strong>24 heures avant</strong> le rendez-vous. Passé ce délai, des frais de <strong>30 $</strong> seront applicables.</p>
+          </div>
+
           <div class="success-actions">
             <button class="btn btn-outline" (click)="backToCalendar()">Retour au calendrier</button>
             <button class="btn btn-terracotta" (click)="showMyBookings()">Voir mes rendez-vous</button>
@@ -283,6 +294,7 @@
           <li><span>⏰</span><div><strong>Durée</strong><span>60 minutes / séance</span></div></li>
           <li><span>💰</span><div><strong>Tarif</strong><span>92 $ / séance</span></div></li>
           <li><span>✅</span><div><strong>Confirmation</strong><span>Dans les 24 heures</span></div></li>
+          <li><span>⚠️</span><div><strong>Annulation</strong><span>Gratuite jusqu'à 24h avant — frais de 30 $ après ce délai</span></div></li>
         </ul>
       </div>
 
