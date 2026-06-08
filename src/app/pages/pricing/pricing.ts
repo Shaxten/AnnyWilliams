@@ -20,7 +20,7 @@ export class PricingComponent implements AfterViewInit {
       schema: {
         '@context': 'https://schema.org',
         '@type': 'PriceSpecification',
-        price: '100',
+        price: '92',
         priceCurrency: 'CAD',
         description: 'Tarif par séance de consultation individuelle',
         eligibleQuantity: { '@type': 'QuantitativeValue', value: 1, unitText: 'séance' }
@@ -30,7 +30,7 @@ export class PricingComponent implements AfterViewInit {
   plans = [
     {
       title: 'Stimulation du langage',
-      price: '100',
+      price: '92',
       unit: '/ séance',
       desc: 'Séance individuelle d\'intervention en langage pour enfant.',
       features: ['Évaluation initiale', 'Plan d\'intervention personnalisé', 'Suivi des progrès', 'Communication avec les parents'],
@@ -39,7 +39,7 @@ export class PricingComponent implements AfterViewInit {
     },
     {
       title: 'Connaissance de soi',
-      price: '100',
+      price: '92',
       unit: '/ séance',
       desc: 'Atelier individuel pour adolescent ou adulte.',
       features: ['Séance de 60 minutes', 'Outils pratiques', 'Espace confidentiel', 'Suivi personnalisé'],
