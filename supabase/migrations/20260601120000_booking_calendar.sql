@@ -144,7 +144,7 @@ from
     current_date + interval '14 days',
     interval '1 day'
   ) as d,
-  unnest(array['09:00','10:00','11:00','13:00','14:00','15:00','16:00']) as t
+  unnest(array['09:00','10:00','11:00','13:00','14:00','15:00','16:00','18:00','19:00']) as t
 where
   extract(dow from d) between 1 and 5  -- lundi à vendredi seulement
 on conflict (slot_date, start_time) do nothing;

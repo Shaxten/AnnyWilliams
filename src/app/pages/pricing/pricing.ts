@@ -41,7 +41,7 @@ export class PricingComponent implements AfterViewInit {
       title: 'Connaissance de soi',
       price: '92',
       unit: '/ séance',
-      desc: 'Atelier individuel pour adolescent ou adulte.',
+      desc: 'Rencontre individuel personnalisé.',
       features: ['Séance de 60 minutes', 'Outils pratiques', 'Espace confidentiel', 'Suivi personnalisé'],
       cta: 'Réserver',
       highlight: true
