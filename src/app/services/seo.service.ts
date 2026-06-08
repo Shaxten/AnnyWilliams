@@ -19,8 +19,8 @@ export class SeoService {
   private document = inject(DOCUMENT);
 
   private readonly siteName    = 'Anny Williams — Coach & Intervenante';
-  private readonly baseUrl     = 'https://shaxten.github.io/AnnyWilliams';
-  private readonly defaultImg  = 'https://shaxten.github.io/AnnyWilliams/assets/og-image.jpg';
+  private readonly baseUrl     = 'https://annywilliams.com';
+  private readonly defaultImg  = 'https://annywilliams.com/assets/og-image.jpg';
   private readonly phone       = '+14508992529';
   private readonly region      = 'Sorel-Tracy, Québec, Canada';
 
