@@ -30,6 +30,9 @@ jobs:
       - name: Build
         run: npm run build -- --configuration production --base-href /
 
+      - name: Generate static route files (fix 404 for crawlers)
+        run: node scripts/generate-routes.js
+
       - name: Add .nojekyll
         run: touch dist/AnnyWilliams/browser/.nojekyll
 

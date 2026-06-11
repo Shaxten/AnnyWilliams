@@ -1,0 +1,5 @@
+/
+/services
+/tarifs
+/a-propos
+/reservation
