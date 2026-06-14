@@ -12,49 +12,11 @@
     <!-- ══ COLONNE PRINCIPALE ══ -->
     <div class="booking-main">
 
-      <!-- ── ÉTAPE: PROFIL ── -->
-      @if (step() === 'profile') {
-        <div class="booking-card">
-          <button class="back-btn" (click)="backToCalendar()">← Retour</button>
-          <h2>Mon profil</h2>
-          <p style="margin-bottom:1.5rem;font-size:.88rem">Ces informations permettent à Anny de vous contacter facilement.</p>
-
-          @if (error()) { <div class="alert alert--error">{{ error() }}</div> }
-          @if (profileSaved()) { <div class="alert alert--success">Profil sauvegardé ✓</div> }
-
-          <form (ngSubmit)="saveProfile()" class="booking-form">
-            <div class="form-group">
-              <label>Courriel</label>
-              <input type="email" [value]="auth.currentUser()?.email" disabled class="input-disabled" />
-            </div>
-            <div class="form-group">
-              <label for="fullName">Nom complet</label>
-              <input id="fullName" type="text" [(ngModel)]="profileForm.full_name" name="full_name" placeholder="Votre nom complet" />
-            </div>
-            <div class="form-group">
-              <label for="phone">Numéro de téléphone</label>
-              <input id="phone" type="tel" [(ngModel)]="profileForm.phone" name="phone" placeholder="450-000-0000" />
-            </div>
-            <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading()">
-              Sauvegarder
-            </button>
-          </form>
-        </div>
-      }
-
       <!-- ── ÉTAPE 1: CALENDRIER ── -->
       @if (step() === 'calendar') {
         <div class="booking-card">
-
-          <!-- Header calendrier -->
           <div class="booking-card__header">
             <h2>Choisissez un créneau</h2>
-            <div class="booking-card__header-actions">
-              @if (auth.isLoggedIn) {
-                <button class="btn-link" (click)="step.set('profile')">Mon profil</button>
-                <button class="btn-link" (click)="showMyBookings()">Mes rendez-vous →</button>
-              }
-            </div>
           </div>
 
           @if (error()) {
@@ -63,7 +25,6 @@
 
           <!-- Calendrier -->
           <div class="cal">
-            <!-- Navigation mois -->
             <div class="cal__nav">
               <button class="cal__nav-btn" (click)="prevMonth()" aria-label="Mois précédent">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -74,14 +35,12 @@
               </button>
             </div>
 
-            <!-- Jours de la semaine -->
             <div class="cal__weekdays">
               @for (d of ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']; track d) {
                 <span>{{ d }}</span>
               }
             </div>
 
-            <!-- Grille des jours -->
             <div class="cal__grid" [class.cal__grid--loading]="loading()">
               @for (day of calendarDays(); track $index) {
                 <button
@@ -89,14 +48,12 @@
                   [class]="getDayClass(day.date)"
                   [disabled]="!day.date || getDayClass(day.date) === 'cal__day--past' || getDayClass(day.date) === 'cal__day--no-slot' || getDayClass(day.date) === 'cal__day--full'"
                   (click)="selectDate(day.date)"
-                  [attr.aria-label]="day.date ? formatDate(day.date) : null"
                 >
                   {{ day.dayNum }}
                 </button>
               }
             </div>
 
-            <!-- Légende -->
             <div class="cal__legend">
               <span class="cal__legend-item"><span class="cal__dot cal__dot--available"></span>Disponible</span>
               <span class="cal__legend-item"><span class="cal__dot cal__dot--full"></span>Complet</span>
@@ -104,12 +61,10 @@
             </div>
           </div>
 
-          <!-- Créneaux du jour sélectionné -->
+          <!-- Créneaux -->
           @if (selectedDate()) {
             <div class="slots-panel">
-              <h3 class="slots-panel__title">
-                {{ formatDate(selectedDate()!) }}
-              </h3>
+              <h3 class="slots-panel__title">{{ formatDate(selectedDate()!) }}</h3>
 
               @if (slotsForDate().length === 0) {
                 <p class="slots-panel__empty">Aucun créneau disponible ce jour.</p>
@@ -130,64 +85,23 @@
                 </div>
               }
 
-              <!-- CTA après sélection d'un slot -->
               @if (selectedSlot()) {
                 <div class="slots-panel__cta">
-                  @if (!auth.isLoggedIn) {
-                    <p class="slots-panel__auth-notice">
-                      Connectez-vous pour confirmer ce créneau.
-                    </p>
-                  } @else {
-                    <button class="btn btn-terracotta" (click)="proceedToForm()">
-                      Continuer →
-                    </button>
-                  }
+                  <button class="btn btn-terracotta" (click)="proceedToForm()">
+                    Continuer →
+                  </button>
                 </div>
               }
             </div>
           }
-
         </div>
-
-        <!-- Auth si non connecté -->
-        @if (!auth.isLoggedIn) {
-          <div class="booking-card booking-card--auth">
-            <div class="auth-tabs">
-              <button class="auth-tab" [class.active]="authMode() === 'login'" (click)="authMode.set('login')">Se connecter</button>
-              <button class="auth-tab" [class.active]="authMode() === 'register'" (click)="authMode.set('register')">Créer un compte</button>
-            </div>
-
-            @if (error()) { <div class="alert alert--error">{{ error() }}</div> }
-            @if (success()) { <div class="alert alert--success">{{ success() }}</div> }
-
-            <form (ngSubmit)="onAuth()" class="auth-form">
-              @if (authMode() === 'register') {
-                <div class="form-group">
-                  <label for="fullName">Nom complet</label>
-                  <input id="fullName" type="text" [(ngModel)]="authForm.fullName" name="fullName" required placeholder="Votre nom" />
-                </div>
-              }
-              <div class="form-group">
-                <label for="email">Courriel</label>
-                <input id="email" type="email" [(ngModel)]="authForm.email" name="email" required placeholder="votre@email.com" />
-              </div>
-              <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input id="password" type="password" [(ngModel)]="authForm.password" name="password" required placeholder="••••••••" />
-              </div>
-              <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading()">
-                {{ authMode() === 'login' ? 'Se connecter' : 'Créer mon compte' }}
-              </button>
-            </form>
-          </div>
-        }
       }
 
       <!-- ── ÉTAPE 2: FORMULAIRE ── -->
       @if (step() === 'form') {
         <div class="booking-card">
           <button class="back-btn" (click)="backToCalendar()">← Retour</button>
-          <h2>Confirmer le rendez-vous</h2>
+          <h2>Vos informations</h2>
 
           <div class="booking-summary">
             <div class="booking-summary__item">
@@ -203,6 +117,22 @@
           @if (error()) { <div class="alert alert--error">{{ error() }}</div> }
 
           <form (ngSubmit)="confirmBooking()" class="booking-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Nom complet *</label>
+                <input id="name" type="text" [(ngModel)]="bookingForm.name" name="name" required placeholder="Votre nom" />
+              </div>
+              <div class="form-group">
+                <label for="email">Courriel *</label>
+                <input id="email" type="email" [(ngModel)]="bookingForm.email" name="email" required placeholder="votre@email.com" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Téléphone</label>
+              <input id="phone" type="tel" [(ngModel)]="bookingForm.phone" name="phone" placeholder="450-000-0000" />
+            </div>
+
             <div class="form-group">
               <label for="service">Service souhaité *</label>
               <select id="service" [(ngModel)]="bookingForm.service" name="service" required>
@@ -212,12 +142,16 @@
                 }
               </select>
             </div>
+
             <div class="form-group">
               <label for="message">Message (optionnel)</label>
               <textarea id="message" [(ngModel)]="bookingForm.message" name="message"
                 placeholder="Décrivez brièvement votre situation..."></textarea>
             </div>
-            <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loading() || !bookingForm.service">
+
+            <button type="submit" class="btn btn-terracotta"
+              style="width:100%;justify-content:center"
+              [disabled]="loading() || !bookingForm.name || !bookingForm.email || !bookingForm.service">
               @if (loading()) { Envoi en cours... } @else { Confirmer le rendez-vous }
             </button>
 
@@ -233,52 +167,17 @@
       @if (step() === 'confirm') {
         <div class="booking-card booking-card--success">
           <div class="success-icon">🌿</div>
-          <h2>Rendez-vous demandé !</h2>
-          <p>Votre demande a été envoyée. Anny vous contactera dans les 24 heures pour confirmer.</p>
+          <h2>Demande envoyée !</h2>
+          <p>Merci <strong>{{ bookingForm.name }}</strong> ! Votre demande a été reçue. Vous recevrez un courriel de confirmation à <strong>{{ bookingForm.email }}</strong> sous peu.</p>
 
           <div class="booking-policy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <p><strong>Politique d'annulation :</strong> Toute annulation doit être effectuée au moins <strong>24 heures avant</strong> le rendez-vous. Passé ce délai, des frais de <strong>30 $</strong> seront applicables.</p>
+            <p><strong>Politique d'annulation :</strong> Toute annulation doit être effectuée au moins <strong>24 heures avant</strong> le rendez-vous. Passé ce délai, des frais de <strong>30 $</strong> seront applicables. Pour annuler, contactez Anny par courriel à <a href="mailto:annywilliamscoach@gmail.com">annywilliamscoach&#64;gmail.com</a> ou par téléphone au <a href="tel:4508992529">450-899-2529</a>.</p>
           </div>
 
           <div class="success-actions">
             <button class="btn btn-outline" (click)="backToCalendar()">Retour au calendrier</button>
-            <button class="btn btn-terracotta" (click)="showMyBookings()">Voir mes rendez-vous</button>
           </div>
-        </div>
-      }
-
-      <!-- ── MES RENDEZ-VOUS ── -->
-      @if (step() === 'my-bookings') {
-        <div class="booking-card">
-          <button class="back-btn" (click)="backToCalendar()">← Retour</button>
-          <h2>Mes rendez-vous</h2>
-
-          @if (myBookings().length === 0) {
-            <p class="empty-state">Vous n'avez aucun rendez-vous pour le moment.</p>
-          } @else {
-            <div class="my-bookings-list">
-              @for (b of myBookings(); track b.id) {
-                <div class="my-booking-item" [class.my-booking-item--cancelled]="b.status === 'cancelled'">
-                  <div class="my-booking-item__info">
-                    <strong>{{ b.service_name }}</strong>
-                    @if (b.availability_slots) {
-                      <span>{{ formatDate(b.availability_slots.slot_date) }}</span>
-                      <span>{{ formatTime(b.availability_slots.start_time) }} – {{ formatTime(b.availability_slots.end_time) }}</span>
-                    }
-                  </div>
-                  <div class="my-booking-item__right">
-                    <span class="status-badge" [class]="'status-badge--' + b.status">
-                      {{ statusLabel(b.status) }}
-                    </span>
-                    @if (b.status !== 'cancelled') {
-                      <button class="btn-link btn-link--danger" (click)="cancelBooking(b.id)">Annuler</button>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          }
         </div>
       }
 
@@ -287,24 +186,17 @@
     <!-- ══ SIDEBAR ══ -->
     <aside class="booking-sidebar">
       <div class="booking-card booking-card--info">
-        <h3 style="margin-bottom:20px;">Informations pratiques</h3>
+        <h3>Informations pratiques</h3>
         <ul class="info-list">
-          <li><span>📍</span><div><strong>Région Sorel-Tracy</strong><span>En personne, en ligne.</span></div></li>
+          <li><span>📍</span><div><strong>Région Sorel-Tracy</strong><span>En personne, en ligne ou par téléphone</span></div></li>
           <li><span>📞</span><div><strong>Téléphone</strong><a href="tel:4508992529">450-899-2529</a></div></li>
-          <li><span>✉️</span><div><strong>Courriel</strong><a href="mailto:annywilliams0309@gmail.com">annywilliams0309@gmail.com</a></div></li>
+          <li><span>✉️</span><div><strong>Courriel</strong><a href="mailto:annywilliamscoach@gmail.com">annywilliamscoach&#64;gmail.com</a></div></li>
           <li><span>⏰</span><div><strong>Durée</strong><span>60 minutes / séance</span></div></li>
-          <li><span>💰</span><div><strong>Tarif</strong><span>92 $ / séance</span></div></li>
+          <li><span>💰</span><div><strong>Tarif</strong><span>100 $ / séance</span></div></li>
           <li><span>✅</span><div><strong>Confirmation</strong><span>Dans les 24 heures</span></div></li>
           <li><span>⚠️</span><div><strong>Annulation</strong><span>Gratuite jusqu'à 24h avant — frais de 30 $ après ce délai</span></div></li>
         </ul>
       </div>
-
-      @if (auth.isLoggedIn) {
-        <div class="booking-card booking-card--user">
-          <p>Connecté en tant que<br><strong>{{ auth.currentUser()?.email }}</strong></p>
-          <button class="btn-link" (click)="auth.signOut()">Se déconnecter</button>
-        </div>
-      }
 
       <div class="booking-card booking-card--quote">
         <blockquote>"Pas à pas, vers plus de clarté, d'autonomie et de sens."</blockquote>

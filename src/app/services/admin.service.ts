@@ -3,10 +3,13 @@ import { SupabaseService } from './supabase.service';
 
 export interface AdminBooking {
   id: number;
-  user_id: string;
+  user_id?: string | null;
   slot_id: number;
   service_name: string;
   message: string | null;
+  guest_name: string | null;
+  guest_email: string | null;
+  guest_phone: string | null;
   status: 'pending' | 'confirmed' | 'cancelled';
   created_at: string;
   availability_slots: {

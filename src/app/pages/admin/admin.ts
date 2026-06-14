@@ -17,17 +17,21 @@ export class AdminComponent implements OnInit {
   private adminSvc = inject(AdminService);
   auth             = inject(AuthService);
 
+  // ── Login ──────────────────────────────────────────────────
+  loginForm   = { email: '', password: '' };
+  loginLoading = signal(false);
+  loginError   = signal('');
+  isAdmin      = signal(false);
+
   tab        = signal<AdminTab>('bookings');
   loading    = signal(false);
   error      = signal('');
   success    = signal('');
 
-  // Bookings
   bookings   = signal<AdminBooking[]>([]);
   filter     = signal('all');
   stats      = signal({ pending: 0, confirmed: 0, cancelled: 0, total: 0 });
 
-  // Slots
   slotDate   = '';
   slotTimes  = [
     '08:00','09:00','10:00','11:00','12:00',
@@ -38,8 +42,41 @@ export class AdminComponent implements OnInit {
   slotsForDate = signal<any[]>([]);
 
   async ngOnInit() {
-    await this.loadBookings();
-    await this.loadStats();
+    // Vérifier si déjà connecté en tant qu'admin
+    const ok = await this.adminSvc.isAdmin();
+    this.isAdmin.set(ok);
+    if (ok) {
+      await this.loadBookings();
+      await this.loadStats();
+    }
+  }
+
+  // ── Login admin ────────────────────────────────────────────
+  async onLogin() {
+    this.loginLoading.set(true);
+    this.loginError.set('');
+    try {
+      await this.auth.signIn(this.loginForm.email, this.loginForm.password);
+      const ok = await this.adminSvc.isAdmin();
+      if (!ok) {
+        await this.auth.signOut();
+        this.loginError.set('Accès refusé — compte non autorisé.');
+        return;
+      }
+      this.isAdmin.set(true);
+      await this.loadBookings();
+      await this.loadStats();
+    } catch (e: any) {
+      this.loginError.set('Courriel ou mot de passe invalide.');
+    } finally {
+      this.loginLoading.set(false);
+    }
+  }
+
+  async onLogout() {
+    await this.auth.signOut();
+    this.isAdmin.set(false);
+    this.bookings.set([]);
   }
 
   async loadBookings() {

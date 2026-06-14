@@ -13,10 +13,13 @@ export interface AvailabilitySlot {
 
 export interface Booking {
   id: number;
-  user_id: string;
+  user_id?: string | null;
   slot_id: number;
   service_name: string;
   message: string | null;
+  guest_name: string | null;
+  guest_email: string | null;
+  guest_phone: string | null;
   status: 'pending' | 'confirmed' | 'cancelled';
   created_at: string;
   availability_slots?: AvailabilitySlot;
@@ -61,29 +64,30 @@ export class CalendarService {
     }));
   }
 
-  // Réserve un slot — utilise une transaction pour éviter les doubles réservations
-  async bookSlot(slotId: number, serviceName: string, message?: string): Promise<Booking> {
-    // Récupérer l'utilisateur connecté
-    const { data: { user } } = await this.supabase.client.auth.getUser();
-    if (!user) throw new Error('Vous devez être connecté pour réserver.');
-
+  // Réserve un slot sans authentification requise
+  async bookSlot(
+    slotId: number,
+    serviceName: string,
+    guestName: string,
+    guestEmail: string,
+    guestPhone: string,
+    message?: string
+  ): Promise<Booking> {
     const { data, error } = await this.supabase.client
       .from('bookings')
       .insert([{
-        user_id:      user.id,          // requis par la politique RLS
         slot_id:      slotId,
         service_name: serviceName,
+        guest_name:   guestName,
+        guest_email:  guestEmail,
+        guest_phone:  guestPhone || null,
         message:      message ?? null,
         status:       'pending'
       }])
-      .select(`
-        *,
-        availability_slots (*)
-      `)
+      .select('*, availability_slots (*)')
       .single();
 
     if (error) {
-      // Code 23505 = violation de contrainte unique → slot déjà pris
       if (error.code === '23505') {
         throw new Error('Ce créneau vient d\'être réservé par quelqu\'un d\'autre. Veuillez en choisir un autre.');
       }

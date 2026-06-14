@@ -436,3 +436,56 @@
   svg { flex-shrink: 0; }
   &:hover { color: var(--text); text-decoration: underline; }
 }
+
+/* ── Login admin ──────────────────────────────────────────── */
+.admin-login {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--beige-light);
+  padding: 2rem;
+}
+
+.admin-login__card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--beige-mid);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem 2.5rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-login__logo {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+
+.admin-login__name {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.admin-login__sub {
+  font-family: var(--font-sans);
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--terracotta);
+}
+
+.admin-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

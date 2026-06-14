@@ -1,5 +1,37 @@
 <div class="admin-layout">
 
+  @if (!isAdmin()) {
+    <!-- ── LOGIN ADMIN ── -->
+    <div class="admin-login">
+      <div class="admin-login__card">
+        <div class="admin-login__logo">
+          <span class="admin-login__name">Anny Williams</span>
+          <span class="admin-login__sub">Administration</span>
+        </div>
+
+        @if (loginError()) {
+          <div class="alert alert--error">{{ loginError() }}</div>
+        }
+
+        <form (ngSubmit)="onLogin()" class="admin-login__form">
+          <div class="form-group">
+            <label for="admin-email">Courriel</label>
+            <input id="admin-email" type="email" [(ngModel)]="loginForm.email" name="email" required placeholder="admin@email.com" />
+          </div>
+          <div class="form-group">
+            <label for="admin-pwd">Mot de passe</label>
+            <input id="admin-pwd" type="password" [(ngModel)]="loginForm.password" name="password" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn btn-terracotta" style="width:100%;justify-content:center" [disabled]="loginLoading()">
+            {{ loginLoading() ? 'Connexion...' : 'Se connecter' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  } @else {
+
+  <!-- ── DASHBOARD ADMIN ── -->
+
   <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div class="admin-sidebar__brand">
@@ -23,7 +55,7 @@
 
     <div class="admin-sidebar__user">
       <span>{{ auth.currentUser()?.email }}</span>
-      <button (click)="auth.signOut()">Déconnexion</button>
+      <button (click)="onLogout()">Déconnexion</button>
     </div>
   </aside>
 
@@ -87,17 +119,17 @@
                 </div>
 
                 <div class="booking-row__client">
-                  <strong>{{ b.profiles?.full_name ?? 'Client' }}</strong>
-                  @if (b.profiles?.email) {
-                    <a class="booking-row__contact" href="mailto:{{ b.profiles!.email }}">
+                  <strong>{{ b.profiles?.full_name ?? b.guest_name ?? 'Client' }}</strong>
+                  @if (b.guest_email || b.profiles?.email) {
+                    <a class="booking-row__contact" href="mailto:{{ b.guest_email ?? b.profiles!.email }}">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                      {{ b.profiles!.email }}
+                      {{ b.guest_email ?? b.profiles?.email }}
                     </a>
                   }
-                  @if (b.profiles?.phone) {
-                    <a class="booking-row__contact" href="tel:{{ b.profiles!.phone }}">
+                  @if (b.guest_phone || b.profiles?.phone) {
+                    <a class="booking-row__contact" href="tel:{{ b.guest_phone ?? b.profiles!.phone }}">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      {{ b.profiles!.phone }}
+                      {{ b.guest_phone ?? b.profiles?.phone }}
                     </a>
                   }
                   <span class="booking-row__service">{{ b.service_name }}</span>
@@ -200,4 +232,5 @@
     }
 
   </main>
+  } <!-- end @else isAdmin -->
 </div>
