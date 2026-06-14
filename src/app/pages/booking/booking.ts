@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarService, AvailabilitySlot } from '../../services/calendar.service';
 import { SeoService } from '../../services/seo.service';
+import { EmailService } from '../../services/email.service';
 
 type BookingStep = 'calendar' | 'form' | 'confirm';
 
@@ -15,7 +16,8 @@ type BookingStep = 'calendar' | 'form' | 'confirm';
 })
 export class BookingComponent implements OnInit, OnDestroy {
   calSvc  = inject(CalendarService);
-  private seoSvc = inject(SeoService);
+  private seoSvc   = inject(SeoService);
+  private emailSvc = inject(EmailService);
 
   constructor() {
     this.seoSvc.set({
@@ -184,6 +186,19 @@ export class BookingComponent implements OnInit, OnDestroy {
         this.bookingForm.phone,
         this.bookingForm.message
       );
+
+      // Envoyer l'email de confirmation au client + notification à Anny
+      await this.emailSvc.sendBookingEmail('new_booking', {
+        guest_name:   this.bookingForm.name,
+        guest_email:  this.bookingForm.email,
+        guest_phone:  this.bookingForm.phone,
+        service_name: this.bookingForm.service,
+        message:      this.bookingForm.message,
+        slot_date:    slot.slot_date,
+        start_time:   slot.start_time,
+        end_time:     slot.end_time,
+      });
+
       this.step.set('confirm');
       await this.loadSlots();
     } catch (e: any) {

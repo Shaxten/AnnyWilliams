@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminBooking } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
+import { EmailService } from '../../services/email.service';
 
 type AdminTab = 'bookings' | 'slots';
 
@@ -16,6 +17,7 @@ type AdminTab = 'bookings' | 'slots';
 export class AdminComponent implements OnInit {
   private adminSvc = inject(AdminService);
   auth             = inject(AuthService);
+  private emailSvc = inject(EmailService);
 
   // ── Login ──────────────────────────────────────────────────
   loginForm   = { email: '', password: '' };
@@ -120,6 +122,23 @@ export class AdminComponent implements OnInit {
     this.error.set('');
     try {
       await this.adminSvc.updateBookingStatus(id, status);
+
+      // Envoyer l'email de confirmation au client
+      if (status === 'confirmed') {
+        const booking = this.bookings().find(b => b.id === id);
+        if (booking && (booking.guest_email || booking.profiles?.email) && booking.availability_slots) {
+          await this.emailSvc.sendBookingEmail('confirmed', {
+            guest_name:   booking.guest_name ?? booking.profiles?.full_name ?? 'Client',
+            guest_email:  booking.guest_email ?? booking.profiles?.email ?? '',
+            guest_phone:  booking.guest_phone ?? booking.profiles?.phone ?? undefined,
+            service_name: booking.service_name,
+            slot_date:    booking.availability_slots.slot_date,
+            start_time:   booking.availability_slots.start_time,
+            end_time:     booking.availability_slots.end_time,
+          });
+        }
+      }
+
       this.success.set(`Rendez-vous ${status === 'confirmed' ? 'confirmé' : 'annulé'}.`);
       setTimeout(() => this.success.set(''), 3000);
       await this.loadBookings();
