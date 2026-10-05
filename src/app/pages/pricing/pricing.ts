@@ -20,7 +20,7 @@ export class PricingComponent implements AfterViewInit {
       schema: {
         '@context': 'https://schema.org',
         '@type': 'PriceSpecification',
-        price: '92',
+        price: '90',
         priceCurrency: 'CAD',
         description: 'Tarif par séance de consultation individuelle',
         eligibleQuantity: { '@type': 'QuantitativeValue', value: 1, unitText: 'séance' }
@@ -30,29 +30,29 @@ export class PricingComponent implements AfterViewInit {
   plans = [
     {
       title: 'Stimulation du langage',
-      price: '92',
-      unit: '/ séance',
+      price: '90',
+      unit: '$ / séance',
       desc: 'Séance individuelle d\'intervention en langage pour enfant.',
       features: ['Évaluation initiale', 'Plan d\'intervention personnalisé', 'Suivi des progrès', 'Communication avec les parents'],
-      cta: 'Réserver',
+      cta: 'Réserver ou me contacter',
       highlight: false
     },
     {
       title: 'Connaissance de soi',
-      price: '92',
-      unit: '/ séance',
+      price: '90',
+      unit: '$ / séance',
       desc: 'Rencontre individuel personnalisé.',
       features: ['Séance de 60 minutes', 'Outils pratiques', 'Espace confidentiel', 'Suivi personnalisé'],
-      cta: 'Réserver',
+      cta: 'Réserver ou me contacter',
       highlight: true
     },
     {
       title: 'Relation d\'aide',
-      price: 'Sur demande',
-      unit: '',
+      price: '90',
+      unit: '$ / séance',
       desc: 'Accompagnement personnalisé selon vos besoins spécifiques.',
-      features: ['Évaluation des besoins', 'Programme adapté', 'Flexibilité horaire', 'Suivi continu'],
-      cta: 'Nous contacter',
+      features: ['Évaluation des besoins', 'Programme adapté', 'Suivi continu'],
+      cta: 'Réserver ou me contacter',
       highlight: false
     }
   ];

@@ -5,8 +5,8 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
-const FROM_EMAIL     = 'Anny Williams <noreply@annywilliams.com>'
-const ANNY_EMAIL     = 'annywilliamscoach@gmail.com'
+const FROM_EMAIL     = 'Anny Williams <rendezvous@annywilliams.com>'
+const ANNY_EMAIL     = 'annywilliams0309@gmail.com'
 const ANNY_PHONE     = '450-899-2529'
 
 interface BookingEmailPayload {
